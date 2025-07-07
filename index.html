@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Attendance System</title>
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect width='100%' height='100%' rx='12' fill='%234f8cff'/><text x='50%' y='57%' font-size='32' font-family='Segoe UI,Arial,sans-serif' font-weight='bold' fill='white' text-anchor='middle'>SN</text></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- Bubble Background (original theme, multiple containers for coverage) -->
+  <div class="bubble-bg" id="bubbleBg"></div>
+
+  <!-- Theme toggle button -->
+  <button class="theme-toggle-btn-fixed" id="themeToggleBtn" title="Toggle theme">🌙</button>
+
+  <div class="glass-box">
+    <div class="text-center mb-4">
+      <div class="monogram">SN</div>
+      <h3 style="font-weight:700;letter-spacing:1px;margin-top:10px;">Attendance System</h3>
+    </div>
+
+    <!-- Screen 1: Faculty -->
+    <section id="screen1">
+      <label for="facultyCode" class="form-label">Faculty Code</label>
+      <input type="text" class="form-control" id="facultyCode" maxlength="6" autocomplete="off" autofocus>
+      <div id="codeMsg" class="error-message"></div>
+      <label for="facultyName" class="form-label">Full Name</label>
+      <input type="text" class="form-control" id="facultyName" maxlength="32" autocomplete="off" disabled>
+      <div id="nameMsg" class="error-message"></div>
+      <button class="btn btn-primary w-100 mt-2" id="facultyNextBtn" onclick="handleFaculty()"
+        tabindex="0">Next</button>
+    </section>
+
+    <!-- Screen 2: Range -->
+    <section id="screen2" style="display:none">
+      <label for="fromRoll" class="form-label">From Roll No</label>
+      <input type="text" class="form-control" id="fromRoll" maxlength="6" autocomplete="off">
+      <label for="toRoll" class="form-label" style="margin-top:12px;">To Roll No</label>
+      <input type="text" class="form-control" id="toRoll" maxlength="6" autocomplete="off">
+      <div id="rangeMsg" class="error-message"></div>
+      <button class="btn btn-primary w-100 mt-2" id="rangeNextBtn" onclick="handleRange()" tabindex="0"
+        disabled>Next</button>
+    </section>
+
+    <!-- Screen 3: Attendance Input -->
+    <section id="screen3" style="display:none">
+      <div class="attendance-meta" id="attendanceMeta"></div>
+      <button class="review-btn" id="reviewBtn" onclick="showReview()" type="button"
+        title="Review (Shortcut: R)">Review</button>
+      <form id="attendanceForm" autocomplete="off">
+        <div class="roll-input-row">
+          <span class="roll-label" id="currentRollLabel"></span>
+          <input type="text" class="form-control" id="presentInput" maxlength="5" autocomplete="off">
+          <span id="presentMsg" class="error-message" style="margin:0;min-width:100px;"></span>
+        </div>
+        <button type="submit" class="btn btn-success w-100 mt-2" id="submitBtn" style="display:none;">Save</button>
+      </form>
+    </section>
+
+    <!-- Screen 4: Review Grid -->
+    <section id="screen4" style="display:none">
+      <h5 class="mb-2">Review Attendance</h5>
+      <div id="reviewGrid"></div>
+      <button class="btn btn-primary w-100 mt-2" onclick="returnToAttendance()">Back</button>
+    </section>
+
+    <!-- Screen 5: Final Notepad Print -->
+    <section id="screen5" style="display:none">
+      <div id="notepadPrint" class="notepad-print"></div>
+      <button class="btn btn-primary w-100 mt-2" onclick="location.reload()">Restart</button>
+    </section>
+  </div>
+
+  <footer class="footer" id="footer">
+    <div id="footer-main">
+      Developed with <span style="color:#ff4484;font-size:1.2em;">&#10084;&#65039;</span> by <strong>Shivang
+        Nandani</strong>
+    </div>
+    <div class="footer-social">
+      <a href="mailto:shivangnandani@gmail.com" target="_blank" class="footer-btn" title="Mail">
+        <span class="text">@</span>
+      </a>
+      <a href="https://in.linkedin.com/in/shivangnandani" target="_blank" class="footer-btn" title="LinkedIn">
+        <svg viewBox="55.005 23.8289 333.061 333.0491" width="28" height="28" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M 338.789 307.609 L 289.44 307.609 L 289.44 230.326 C 289.44 211.898 289.111 188.174 263.773 188.174 C 238.07 188.174 234.138 208.253 234.138 228.985 L 234.138 307.604 L 184.788 307.604 L 184.788 148.679 L 232.164 148.679 L 232.164 170.398 L 232.827 170.398 C 242.491 153.881 260.452 144.017 279.57 144.726 C 329.587 144.726 338.809 177.626 338.809 220.426 L 338.789 307.609 Z M 129.106 126.955 C 107.063 126.96 93.281 103.098 104.298 84.006 C 115.319 64.909 142.877 64.909 153.904 83.996 C 156.418 88.35 157.739 93.29 157.739 98.312 C 157.744 114.13 144.923 126.955 129.106 126.955 M 153.781 307.609 L 104.38 307.609 L 104.38 148.679 L 153.781 148.679 L 153.781 307.609 Z M 363.391 23.851 L 79.582 23.851 C 66.17 23.702 55.169 34.446 55.005 47.858 L 55.005 332.844 C 55.164 346.266 66.165 357.02 79.582 356.876 L 363.391 356.876 C 376.839 357.046 387.881 346.292 388.066 332.844 L 388.066 47.837 C 387.876 34.4 376.834 23.656 363.391 23.831"
+            fill="#0b65c2"></path>
+        </svg>
+      </a>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
