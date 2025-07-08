@@ -72,7 +72,14 @@
     <!-- Screen 5: Final Notepad Print -->
     <section id="screen5" style="display:none">
       <div id="notepadPrint" class="notepad-print"></div>
-      <button class="btn btn-primary w-100 mt-2" onclick="location.reload()">Restart</button>
+      <div class="mb-2" style="text-align:center;">
+        <label for="downloadFormat" style="font-weight:600;">Download Format:</label>
+        <select id="downloadFormat" style="margin-left:8px;">
+          <option value="txt">TXT</option>
+          <option value="csv">CSV</option>
+        </select>
+      </div>
+      <button class="btn btn-primary w-100 mt-2" id="saveBtn">Download</button>
     </section>
   </div>
 
