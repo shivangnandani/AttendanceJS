@@ -191,8 +191,8 @@ function handleRange() {
     if (!validateRangeInputs()) return;
     fromRoll = parseInt(fromRollInput.value.trim(), 10);
     toRoll = parseInt(toRollInput.value.trim(), 10);
-    if (fromRoll >= 109 && toRoll <= 280) className = "A";
-    else if (fromRoll >= 301 && toRoll <= 429) className = "B";
+    if (fromRoll >= 101 && toRoll <= 280) className = "A";
+    else if (fromRoll >= 301 && toRoll <= 427) className = "B";
     else className = "Other";
     rollNos = [];
     for (let i = fromRoll; i <= toRoll; i++) rollNos.push(i);
