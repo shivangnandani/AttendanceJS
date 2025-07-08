@@ -468,3 +468,53 @@ body.dark-mode .roll-label {
 body.dark-mode .error-message {
     color: #ff8c8c;
 }
+
+#presentInput.invalid {
+    border-color: #ff4d4d !important;
+    background: #fff0f0 !important;
+    color: #ff4d4d !important;
+    animation: shake 0.2s;
+}
+
+@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-3px);
+    }
+
+    50% {
+        transform: translateX(3px);
+    }
+
+    75% {
+        transform: translateX(-3px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.dropdown-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+    margin-top: 8px;
+    justify-content: center;
+}
+
+.dropdown-wrap label {
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+#saveBtn:focus {
+  outline: 3px solid #4f8cff !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px #e3f0ff;
+  transition: box-shadow 0.2s;
+}
