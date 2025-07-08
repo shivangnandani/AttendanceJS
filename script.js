@@ -73,6 +73,7 @@ let fromRoll = 0, toRoll = 0, className = "";
 let attendanceList = [], rollNos = [];
 let attendanceDate = "", attendanceTime = "", attendanceSlot = "";
 let attendancePointer = 0;
+let inputTimeout = null;
 
 const facultyCodeInput = document.getElementById('facultyCode');
 const facultyNameInput = document.getElementById('facultyName');
@@ -259,12 +260,15 @@ document.getElementById('presentInput').addEventListener('keydown', function (e)
         handleAttendanceInput();
     }
 });
+
 function handleAttendanceInput() {
     let input = document.getElementById('presentInput');
     let val = input.value.trim().toLowerCase();
     let msg = document.getElementById('presentMsg');
     msg.textContent = "";
     input.classList.remove("invalid");
+    clearTimeout(inputTimeout);
+
     if (!/^(1|0|p|a|present|absent)$/i.test(val)) {
         msg.textContent = "Enter 1/0 or p/a";
         input.classList.add("invalid");
@@ -276,6 +280,8 @@ function handleAttendanceInput() {
     attendancePointer++;
     showCurrentRoll();
 }
+
+
 document.getElementById('attendanceForm').addEventListener('submit', function (e) {
     e.preventDefault();
     if (attendancePointer < rollNos.length) {
@@ -371,44 +377,72 @@ window.addEventListener('keydown', function (e) {
     }
 });
 
-// ---- Notepad Print, Download, Clipboard ----
-function showNotepadPrint() {
-    let absent = attendanceList.filter(a => !a.present).map(a => a.roll);
-    let present = attendanceList.filter(a => a.present).map(a => a.roll);
-    let lines = [];
-    lines.push(`Faculty: ${facultyName}`);
-    lines.push(`Date: ${attendanceDate}`);
-    lines.push(`Time: ${attendanceTime}`);
-    lines.push(`Slot: ${attendanceSlot}`);
-    lines.push(`Class: ${className}`);
-    lines.push(`Range: ${fromRoll} - ${toRoll}`);
-    lines.push(`Absent:`);
-    lines.push(absent.length ? absent.join(', ') : "None");
-    lines.push(`Present:`);
-    lines.push(present.length ? present.join(', ') : "None");
-    let fileContent = lines.join('\n');
-    document.getElementById('notepadPrint').textContent = fileContent;
-    document.getElementById('screen5').style.display = "";
-
-    // Download as txt file
-    let dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '_');
-    let filename = `${className}_${dateStr}.txt`;
-    let blob = new Blob([fileContent], { type: 'text/plain' });
-    let a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => { document.body.removeChild(a); }, 200);
-
-    // Copy absent list to clipboard
-    if (absent.length) {
-        navigator.clipboard.writeText(absent.join(', '));
-    } else {
-        navigator.clipboard.writeText('');
-    }
-}
-
 window.onload = function () {
     setTimeout(() => facultyCodeInput.focus(), 120);
 };
+
+function showNotepadPrint() {
+    let absent = attendanceList.filter(a => !a.present).map(a => a.roll);
+    let present = attendanceList.filter(a => a.present).map(a => a.roll);
+
+    // Prepare TXT content (full report)
+    let txtLines = [];
+    txtLines.push(`Faculty: ${facultyName}`);
+    txtLines.push(`Date: ${attendanceDate}`);
+    txtLines.push(`Time: ${attendanceTime}`);
+    txtLines.push(`Slot: ${attendanceSlot}`);
+    txtLines.push(`Class: ${className}`);
+    txtLines.push(`Range: ${fromRoll} - ${toRoll}`);
+    txtLines.push(`Absent:`);
+    txtLines.push(absent.length ? absent.join(', ') : "None");
+    txtLines.push(`Present:`);
+    txtLines.push(present.length ? present.join(', ') : "None");
+    let txtContent = txtLines.join('\n');
+
+    // Prepare CSV content (only absent roll numbers comma separated)
+    let csvContent = absent.length ? absent.join(',') : '';
+
+    // Show TXT preview by default
+    document.getElementById('notepadPrint').textContent = txtContent;
+    document.getElementById('screen5').style.display = "";
+
+    const fileTypeSelect = document.getElementById('downloadFormat');
+    const saveBtn = document.getElementById('saveBtn');
+
+    // Restore last selected format or default to txt
+    const savedType = localStorage.getItem('fileTypeSelect');
+    if (savedType) fileTypeSelect.value = savedType;
+    else fileTypeSelect.value = 'txt';
+
+    // Update preview and focus Save button on dropdown change
+    fileTypeSelect.onchange = function () {
+        localStorage.setItem('fileTypeSelect', this.value);
+        if (this.value === 'csv') {
+            document.getElementById('notepadPrint').textContent = csvContent;
+        } else {
+            document.getElementById('notepadPrint').textContent = txtContent;
+        }
+        saveBtn.focus();  // Auto focus Save button on dropdown change
+    };
+
+    // Initial focus on Save button when page shows
+    saveBtn.focus();
+
+    // Save button: download and copy
+    saveBtn.onclick = function () {
+        let format = fileTypeSelect.value;
+        let content = (format === 'csv') ? csvContent : txtContent;
+        let ext = format;
+        let dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '_');
+        let filename = `${className}_${dateStr}.${ext}`;
+        let mimeType = (format === 'csv') ? 'text/csv' : 'text/plain';
+        let blob = new Blob([content], { type: mimeType });
+        let a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { document.body.removeChild(a); }, 200);
+        navigator.clipboard.writeText(content);
+    };
+}
