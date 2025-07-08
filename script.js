@@ -49,9 +49,9 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 window.addEventListener('keydown', function (e) {
     // Theme toggle on spacebar (when not typing)
-    if (e.key === " " && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
-        toggleTheme();
-    }
+    //if (e.key === " " && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
+      //  toggleTheme();
+   // }
 });
 
 // ---- Attendance System JS ----
