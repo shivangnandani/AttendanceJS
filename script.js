@@ -455,7 +455,7 @@ function showNotepadPrint() {
     a.click();
     setTimeout(() => { document.body.removeChild(a); }, 200);
     // Copy to clipboard
-    navigator.clipboard.writeText(content);
+    navigator.clipboard.writeText(csvContent);
   };
 }
 
