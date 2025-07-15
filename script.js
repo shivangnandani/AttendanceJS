@@ -301,6 +301,8 @@ document.getElementById('attendanceForm').addEventListener('submit', function(e)
   if (attendancePointer < rollNos.length) {
     handleAttendanceInput();
   } else {
+    const absentRolls = attendanceList.filter(a => !a.present).map(a => a.roll);
+    const csvContent = absentRolls.length ? absentRolls.join(',') : '';
     navigator.clipboard.writeText(csvContent)
     document.getElementById('screen3').style.display = "none";
     showNotepadPrint();
