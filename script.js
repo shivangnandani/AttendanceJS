@@ -301,6 +301,7 @@ document.getElementById('attendanceForm').addEventListener('submit', function(e)
   if (attendancePointer < rollNos.length) {
     handleAttendanceInput();
   } else {
+    navigator.clipboard.writeText(csvContent)
     document.getElementById('screen3').style.display = "none";
     showNotepadPrint();
   }
